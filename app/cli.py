@@ -1,6 +1,6 @@
 import click
 from database import Session
-from models import Student
+from models import Student, Course, Session
 
 @click.group()
 def cli():
@@ -30,6 +30,30 @@ def list_students():
             click.echo(f'Student ID: {student.student_id}, Name: {student.name}')
     else:
         click.echo('No students found.')
+
+@cli.command()
+@click.option('--name', prompt='Course Name', help='Name of the course')
+def add_course(name):
+    """Add a new course"""
+    session = Session()
+    course = Course(name=name)
+    session.add(course)
+    session.commit()
+    session.close()
+    click.echo(f'Course "{name}" added successfully.')
+
+@cli.command()
+def list_courses():
+    """List all courses"""
+    session = Session()
+    courses = session.query(Course).all()
+    session.close()
+    if courses:
+        click.echo("List of Courses:")
+        for course in courses:
+            click.echo(f'Course ID: {course.id}, Name: {course.name}')
+    else:
+        click.echo('No courses found.')
 
 
 if __name__ == '__main__':
