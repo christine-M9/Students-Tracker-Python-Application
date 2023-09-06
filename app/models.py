@@ -18,6 +18,7 @@ class Student(Base):
     id=Column(Integer, primary_key=True)
     name=Column(String)
     student_id=Column(Integer)
+    email=Column(String)
 
     courses = relationship('Course', secondary=student_courses, back_populates='students')
 
