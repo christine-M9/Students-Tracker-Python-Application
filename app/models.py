@@ -21,6 +21,10 @@ class Student(Base):
 
     courses = relationship('Course', secondary=student_courses, back_populates='students')
 
+    def get_enrolled_courses(self):
+        return [course.name for course in self.courses]
+
+
 class Course(Base):
     __tablename__ = 'courses'
 

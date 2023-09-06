@@ -55,6 +55,57 @@ def list_courses():
     else:
         click.echo('No courses found.')
 
+@cli.command()
+@click.option('--student-id', prompt='Student ID', help='Student ID')
+@click.option('--course-id', prompt='Course ID', help='Course ID')
+def enrol_student(student_id, course_id):
+    """Enroll a student in a course"""
+    session = Session()
+
+    
+    student = session.query(Student).filter_by(student_id=student_id).first()
+    course = session.query(Course).filter_by(id=course_id).first()
+
+    if not student:
+        click.echo(f'Student with ID "{student_id}" not found.')
+        session.close()
+        return
+
+    if not course:
+        click.echo(f'Course with ID "{course_id}" not found.')
+        session.close()
+        return
+
+    student.courses.append(course)
+    session.commit()
+    click.echo(f'Student "{student.name}" with ID "{student.student_id}" enrolled in course "{course.name}" successfully.')
+   
+    session.close()
+
+@cli.command()
+@click.option('--student-id', prompt='Student ID', help='Student ID')
+def get_enrolled_courses(student_id):
+    """Get enrolled courses for a student"""
+    session = Session()
+    student = session.query(Student).filter_by(student_id=student_id).first()
+
+    if not student:
+        click.echo(f'Student with ID "{student_id}" not found.')
+        session.close()
+        return
+
+    enrolled_courses = student.get_enrolled_courses()
+    session.close()
+
+    if enrolled_courses:
+        click.echo(f'Enrolled courses for Student "{student.name}" with ID "{student.student_id}":')
+        for course_name in enrolled_courses:
+            click.echo(course_name)
+    else:
+        click.echo(f'Student "{student.name}" with ID "{student.student_id}" is not enrolled in any courses.')
+
+       
+
 
 if __name__ == '__main__':
     cli()
