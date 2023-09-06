@@ -9,14 +9,16 @@ def cli():
 @cli.command()
 @click.option('--name', prompt='Student Name', help='Name of the student')
 @click.option('--student-id', prompt='Student ID', help='Student ID')
-def add_student(name, student_id):
+@click.option('--email', prompt='Student Email', help='Student Email')
+
+def add_student(name, student_id, email):
     """Add a new student"""
     session = Session()
-    student = Student(name=name, student_id=student_id)
+    student = Student(name=name, student_id=student_id, email=email)
     session.add(student)
     session.commit()
     session.close()
-    click.echo(f'Student "{name}" with ID "{student_id}" added successfully.')
+    click.echo(f'Student "{name}" with ID "{student_id}" and Email "{email}" added successfully.')
 
 @cli.command()
 def list_students():
@@ -27,20 +29,21 @@ def list_students():
     if students:
         click.echo("List of Students:")
         for student in students:
-            click.echo(f'Student ID: {student.student_id}, Name: {student.name}')
+             click.echo(f'Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}')
     else:
         click.echo('No students found.')
 
 @cli.command()
 @click.option('--name', prompt='Course Name', help='Name of the course')
-def add_course(name):
+@click.option('--description', prompt='Course Description', help='Course Description')
+def add_course(name, description):
     """Add a new course"""
     session = Session()
-    course = Course(name=name)
+    course = Course(name=name, description=description)
     session.add(course)
     session.commit()
     session.close()
-    click.echo(f'Course "{name}" added successfully.')
+    click.echo(f'Course "{name}" with Description "{description}"added successfully.')
 
 @cli.command()
 def list_courses():
@@ -51,7 +54,7 @@ def list_courses():
     if courses:
         click.echo("List of Courses:")
         for course in courses:
-            click.echo(f'Course ID: {course.id}, Name: {course.name}')
+             click.echo(f'Course ID: {course.id}, Name: {course.name}, Description: {course.description}')
     else:
         click.echo('No courses found.')
 
@@ -104,7 +107,21 @@ def get_enrolled_courses(student_id):
     else:
         click.echo(f'Student "{student.name}" with ID "{student.student_id}" is not enrolled in any courses.')
 
-       
+@cli.command()
+@click.option('--name', prompt='Student Name', help='Name of the student to search for')
+def search_student_by_name(name):
+    """Search for a student by name"""
+    session = Session()
+    
+    students = session.query(Student).filter(Student.name.ilike(f"%{name}%")).all()
+    session.close()
+
+    if students:
+        click.echo("Matching Students:")
+        for student in students:
+            click.echo(f'Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}')
+    else:
+        click.echo(f'No students found with the name "{name}".')       
 
 
 if __name__ == '__main__':
