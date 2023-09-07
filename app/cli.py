@@ -121,7 +121,36 @@ def search_student_by_name(name):
         for student in students:
             click.echo(f'Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}')
     else:
-        click.echo(f'No students found with the name "{name}".')       
+        click.echo(f'No students found with the name "{name}".') 
+
+ 
+
+@cli.command()
+@click.option('--course-id', prompt='Course ID', help='Course ID')
+def get_students_in_course(course_id):
+    """Get students in a specific course"""
+    session = Session()
+
+    course = session.query(Course).filter_by(id=course_id).first()
+
+    if not course:
+        click.echo(f'Course with ID "{course_id}" not found.')
+        session.close()
+        return
+
+    students_in_course = course.students
+
+    if students_in_course:
+        click.echo(f'Students in course "{course.name}" (Course ID: {course.id}):')
+        for student in students_in_course:
+            click.echo(f'Student ID: {student.student_id}, Name: {student.name}, Email: {student.email}')
+    else:
+        click.echo(f'No students found in course "{course.name}" (Course ID: {course.id}).')
+
+    session.close()
+
+
+             
 
 
 if __name__ == '__main__':
